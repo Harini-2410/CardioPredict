@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — CardioPredict</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F7FC;
+    --panel: #FFFFFF;
+    --panel-2: #F1F4FA;
+    --border: #E1E7F2;
+    --text: #16213E;
+    --text-muted: #6B7A99;
+    --teal: #0D9488;
+    --teal-dim: #0F766E;
+    --sky: #0284C7;
+    --high: #DC2626;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  @keyframes drift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 40px) scale(1.15); }
+  }
+  @keyframes drift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, 30px) scale(1.1); }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-orb.o1 {
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, #5EEAD4, transparent 70%);
+    top: -160px; left: -140px;
+    animation: drift1 18s ease-in-out infinite;
+  }
+  .glow-orb.o2 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, #7DD3FC, transparent 70%);
+    bottom: -160px; right: -140px;
+    animation: drift2 22s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.12); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    60% { transform: scale(1); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 16px 2px rgba(13, 148, 136, 0.35); }
+    50% { box-shadow: 0 0 26px 6px rgba(13, 148, 136, 0.5), 0 0 14px 2px rgba(2, 132, 199, 0.3); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .auth-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    margin: 24px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    box-shadow: 0 12px 40px -16px rgba(22, 33, 62, 0.15);
+    animation: fadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .brand-mark {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    display: flex; align-items: center; justify-content: center;
+    animation: glowPulse 2.6s ease-in-out infinite;
+  }
+  .brand-mark svg { width: 20px; height: 20px; animation: heartbeat 2.6s ease-in-out infinite; }
+
+  .brand h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    margin: 0 0 26px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+
+  label { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+
+  input {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 11px 13px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.25s ease;
+    width: 100%;
+  }
+  input:hover { border-color: #C3CDE3; }
+  input:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.14);
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 6px;
+    background: linear-gradient(110deg, var(--teal), var(--sky), var(--teal));
+    background-size: 200% 100%;
+    color: #052326;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.3s ease, background-position 0.6s ease;
+    box-shadow: 0 4px 20px -6px rgba(13, 148, 136, 0.4);
+  }
+  .submit-btn:hover {
+    background-position: 100% 0;
+    box-shadow: 0 6px 28px -4px rgba(13, 148, 136, 0.55);
+    transform: translateY(-1px);
+  }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .switch-line {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+  .switch-line a {
+    color: var(--teal-dim);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .switch-line a:hover { text-decoration: underline; }
+
+  .error-box {
+    background: rgba(220,38,38,0.08);
+    border: 1px solid rgba(220,38,38,0.28);
+    color: var(--high);
+    border-radius: 9px;
+    padding: 11px 13px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeSlideUp 0.35s ease;
+  }
+
+  .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+  .loading-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #052326;
+    animation: pulse 1s infinite ease-in-out;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="glow-orb o1"></div>
+<div class="glow-orb o2"></div>
+
+<div class="auth-card">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21s-7.5-4.6-10-9.3C.3 8.1 2 4.5 5.6 4c2-.3 3.8.6 4.8 2.2C11.4 4.6 13.2 3.7 15.2 4 18.8 4.5 20.5 8.1 18.8 11.7 16.3 16.4 8.8 21 8.8 21" stroke="#052326" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>CardioPredict</h1>
+  </div>
+
+  <h2>Create your account</h2>
+  <p class="subtitle">Sign up to start screening your heart disease risk</p>
+
+  <div class="error-box" id="error-box"></div>
+
+  <form id="signup-form">
+    <div class="field">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required placeholder="Your name">
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" required placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" required placeholder="At least 6 characters" minlength="6">
+    </div>
+    <div class="field">
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" id="confirm-password" required placeholder="Re-enter password" minlength="6">
+    </div>
+    <button type="submit" class="submit-btn" id="submit-btn">Sign Up</button>
+  </form>
+
+  <p class="switch-line">Already have an account? <a href="login.html">Log in</a></p>
+</div>
+
+<script>
+  const API_URL = "http://127.0.0.1:5000/signup";
+  const form = document.getElementById("signup-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const errorBox = document.getElementById("error-box");
+
+  // If already logged in, skip straight to the app
+  if (localStorage.getItem("cardiopredict_user")) {
+    window.location.href = "index.html";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.style.display = "none";
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirm-password").value;
+
+    if (password !== confirmPassword) {
+      errorBox.textContent = "Passwords don't match.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Creating account <span class="loading-dots"><span></span><span></span><span></span></span>';
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Sign up failed.");
+
+      localStorage.setItem("cardiopredict_user", JSON.stringify(data));
+      window.location.href = "index.html";
+
+    } catch (err) {
+      errorBox.textContent = err.message.includes("Failed to fetch")
+        ? "Couldn't reach the backend. Make sure app.py is running on http://127.0.0.1:5000."
+        : err.message;
+      errorBox.style.display = "block";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Sign Up";
+    }
+  });
+</script>
+
+</body>
+</html>

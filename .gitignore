@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# Model intermediate files (regenerable, keep repo lightweight)
+model/splits.npz
+model/training_history.pkl
+
+# Database (don't upload real user data)
+backend/users.db
+
+# OS files
+.DS_Store
+Thumbs.db

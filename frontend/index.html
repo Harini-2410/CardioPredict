@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioPredict — Heart Disease Risk Screening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F7FC;
+    --panel: #FFFFFF;
+    --panel-2: #F1F4FA;
+    --border: #E1E7F2;
+    --text: #16213E;
+    --text-muted: #6B7A99;
+    --teal: #0D9488;
+    --teal-dim: #0F766E;
+    --sky: #0284C7;
+    --low: #059669;
+    --medium: #D97706;
+    --high: #DC2626;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  @keyframes drift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 40px) scale(1.15); }
+  }
+  @keyframes drift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, 30px) scale(1.1); }
+  }
+  @keyframes drift3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -50px) scale(1.2); }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-orb.o1 {
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, #5EEAD4, transparent 70%);
+    top: -180px; left: -160px;
+    animation: drift1 18s ease-in-out infinite;
+  }
+  .glow-orb.o2 {
+    width: 460px; height: 460px;
+    background: radial-gradient(circle, #7DD3FC, transparent 70%);
+    top: 20%; right: -180px;
+    animation: drift2 22s ease-in-out infinite;
+  }
+  .glow-orb.o3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #C4B5FD, transparent 70%);
+    bottom: -160px; left: 30%;
+    animation: drift3 26s ease-in-out infinite;
+    opacity: 0.22;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 36px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    animation: fadeSlideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.12); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    60% { transform: scale(1); }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 16px 2px rgba(13, 148, 136, 0.35), 0 0 0 rgba(2, 132, 199, 0); }
+    50% { box-shadow: 0 0 26px 6px rgba(13, 148, 136, 0.5), 0 0 14px 2px rgba(2, 132, 199, 0.3); }
+  }
+
+  .brand-mark {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    animation: glowPulse 2.6s ease-in-out infinite;
+  }
+
+  .brand-mark svg {
+    width: 21px; height: 21px;
+    animation: heartbeat 2.6s ease-in-out infinite;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+    background: linear-gradient(90deg, var(--text), var(--sky) 120%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .tagline {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    max-width: 360px;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    .tagline { text-align: left; }
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: 0 8px 32px -16px rgba(22, 33, 62, 0.12);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .card:hover {
+    border-color: rgba(13, 148, 136, 0.3);
+    box-shadow: 0 12px 40px -14px rgba(13, 148, 136, 0.2);
+  }
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 28px;
+    opacity: 0;
+    animation: fadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  fieldset:nth-of-type(1) { animation-delay: 0.05s; }
+  fieldset:nth-of-type(2) { animation-delay: 0.12s; }
+  fieldset:nth-of-type(3) { animation-delay: 0.19s; }
+  fieldset:nth-of-type(4) { animation-delay: 0.26s; }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  fieldset:last-of-type { margin-bottom: 0; }
+
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.span-2 { grid-column: span 2; }
+
+  label {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  input, select {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.15s ease;
+    width: 100%;
+  }
+
+  input:hover, select:hover {
+    border-color: #33448A;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.14), 0 0 18px -4px rgba(13, 148, 136, 0.4);
+  }
+
+  input[type="number"]::-webkit-inner-spin-button {
+    opacity: 0.6;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .toggle-row:has(input:checked) {
+    border-color: rgba(13, 148, 136, 0.4);
+    box-shadow: 0 0 16px -6px rgba(13, 148, 136, 0.45);
+  }
+
+  .toggle-row label { color: var(--text); font-size: 13.5px; }
+
+  .switch {
+    position: relative;
+    width: 38px; height: 22px;
+    flex-shrink: 0;
+    display: inline-block;
+    cursor: pointer;
+  }
+  .switch input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: #CBD5E8;
+    border-radius: 999px;
+    transition: 0.25s ease;
+  }
+  .slider::before {
+    content: "";
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  input:checked + .slider { background: var(--teal-dim); box-shadow: 0 0 10px rgba(13, 148, 136, 0.5); }
+  input:checked + .slider::before { transform: translateX(16px); background: var(--teal); }
+
+  .toggles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: linear-gradient(110deg, var(--teal), var(--sky), var(--teal));
+    background-size: 200% 100%;
+    color: #052326;
+    border: none;
+    border-radius: 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.3s ease, background-position 0.6s ease;
+    box-shadow: 0 4px 20px -6px rgba(13, 148, 136, 0.4);
+  }
+  .submit-btn:hover {
+    background-position: 100% 0;
+    box-shadow: 0 6px 28px -4px rgba(13, 148, 136, 0.55);
+    transform: translateY(-1px);
+  }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .error-box {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.35);
+    color: var(--high);
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-top: 14px;
+    display: none;
+    animation: fadeSlideUp 0.35s ease;
+  }
+
+  /* ---------- Result panel ---------- */
+  .result-card {
+    position: sticky;
+    top: 24px;
+  }
+
+  .result-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+    gap: 12px;
+  }
+
+  .result-empty svg {
+    width: 42px; height: 42px;
+    opacity: 0.4;
+    animation: heartbeat 3s ease-in-out infinite;
+  }
+  .result-empty p { font-size: 13.5px; line-height: 1.6; margin: 0; max-width: 240px; }
+
+  .result-body { display: none; }
+  .result-body.show {
+    display: block;
+    animation: resultReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .result-empty.hide { display: none; }
+
+  @keyframes resultReveal {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    padding: 6px 0;
+  }
+
+  .risk-dot {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    animation: dotPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+    50% { box-shadow: 0 0 0 6px transparent; opacity: 0.75; }
+  }
+
+  .probability-readout {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .probability-readout span { color: var(--text); font-weight: 600; }
+
+  .spectrum { margin: 24px 0 6px; }
+
+  .spectrum-track {
+    position: relative;
+    height: 11px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--low) 0%, var(--low) 33%, var(--medium) 33%, var(--medium) 66%, var(--high) 66%, var(--high) 100%);
+    opacity: 0.9;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .spectrum-marker {
+    position: absolute;
+    top: -5.5px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--panel);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5), 0 2px 12px rgba(0,0,0,0.5), 0 0 20px 4px var(--marker-glow, transparent);
+    transform: translateX(-50%);
+    transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+    left: 0%;
+  }
+
+  .spectrum-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  .recommendation-box {
+    margin-top: 22px;
+    padding: 16px;
+    border-radius: 11px;
+    background: var(--panel-2);
+    border-left: 3px solid var(--teal);
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text);
+    box-shadow: -8px 0 24px -16px rgba(13, 148, 136, 0.4);
+  }
+
+  .disclaimer {
+    margin-top: 20px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .finder-section {
+    margin-top: 22px;
+    display: none;
+  }
+  .finder-section.show { display: block; }
+
+  .finder-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.25s ease;
+  }
+  .finder-btn:hover {
+    border-color: rgba(13, 148, 136, 0.4);
+    box-shadow: 0 0 16px -6px rgba(13, 148, 136, 0.35);
+  }
+  .finder-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .finder-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .finder-status {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-top: 10px;
+  }
+
+  .hospital-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hospital-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    animation: fadeSlideUp 0.4s ease;
+  }
+
+  .hospital-info { min-width: 0; }
+  .hospital-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hospital-distance {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .directions-link {
+    flex-shrink: 0;
+    background: var(--teal);
+    color: #052326;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 999px;
+    transition: filter 0.15s ease;
+    white-space: nowrap;
+  }
+  .directions-link:hover { filter: brightness(1.1); }
+
+  .loading-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .loading-dots span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #052326;
+    animation: pulse 1s infinite ease-in-out;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
+
+  ::selection { background: var(--teal-dim); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="glow-orb o1"></div>
+<div class="glow-orb o2"></div>
+<div class="glow-orb o3"></div>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21s-7.5-4.6-10-9.3C.3 8.1 2 4.5 5.6 4c2-.3 3.8.6 4.8 2.2C11.4 4.6 13.2 3.7 15.2 4 18.8 4.5 20.5 8.1 18.8 11.7 16.3 16.4 8.8 21 8.8 21" stroke="#052326" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>CardioPredict</h1>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <p class="tagline" style="margin:0;">Deep learning heart disease risk screening — a preliminary tool, not a diagnosis.</p>
+      <div id="user-chip" style="display:flex; align-items:center; gap:10px; padding:6px 6px 6px 12px; background:var(--panel-2); border:1px solid var(--border); border-radius:999px; font-size:13px; white-space:nowrap;">
+        <span id="user-name-text" style="color:var(--text-muted);"></span>
+        <button id="logout-btn" style="background:var(--panel); border:1px solid var(--border); border-radius:999px; padding:5px 12px; font-size:12.5px; font-weight:600; color:var(--text); cursor:pointer; font-family:'Inter',sans-serif;">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- FORM -->
+    <div class="card">
+      <form id="predict-form">
+
+        <fieldset>
+          <legend class="section-title">Demographics</legend>
+          <div class="grid">
+            <div class="field">
+              <label for="Age">Age (years)</label>
+              <input type="number" id="Age" required min="1" max="120" placeholder="e.g. 54">
+            </div>
+            <div class="field">
+              <label for="Gender">Gender</label>
+              <select id="Gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="Weight">Weight (kg)</label>
+              <input type="number" id="Weight" required min="20" max="300" step="0.1" placeholder="e.g. 78">
+            </div>
+            <div class="field">
+              <label for="Height">Height (cm)</label>
+              <input type="number" id="Height" required min="100" max="250" step="0.1" placeholder="e.g. 172">
+            </div>
+            <div class="field span-2">
+              <label for="BMI">BMI</label>
+              <input type="number" id="BMI" required min="10" max="60" step="0.1" placeholder="e.g. 26.4">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="section-title">Vitals & Labs</legend>
+          <div class="grid">
+            <div class="field">
+              <label for="Systolic_BP">Systolic BP (mmHg)</label>
+              <input type="number" id="Systolic_BP" required min="70" max="260" placeholder="e.g. 128">
+            </div>
+            <div class="field">
+              <label for="Diastolic_BP">Diastolic BP (mmHg)</label>
+              <input type="number" id="Diastolic_BP" required min="40" max="160" placeholder="e.g. 82">
+            </div>
+            <div class="field">
+              <label for="Heart_Rate">Heart Rate (bpm)</label>
+              <input type="number" id="Heart_Rate" required min="30" max="220" placeholder="e.g. 74">
+            </div>
+            <div class="field">
+              <label for="Blood_Sugar_Fasting">Fasting Blood Sugar (mg/dL)</label>
+              <input type="number" id="Blood_Sugar_Fasting" required min="40" max="400" placeholder="e.g. 98">
+            </div>
+            <div class="field span-2">
+              <label for="Cholesterol_Total">Total Cholesterol (mg/dL)</label>
+              <input type="number" id="Cholesterol_Total" required min="80" max="500" placeholder="e.g. 195">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="section-title">Lifestyle</legend>
+          <div class="grid">
+            <div class="field">
+              <label for="Smoking">Smoking</label>
+              <select id="Smoking" required>
+                <option value="Never">Never</option>
+                <option value="Former">Former</option>
+                <option value="Current">Current</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="Alcohol_Intake">Alcohol Intake</label>
+              <select id="Alcohol_Intake" required>
+                <option value="None">None</option>
+                <option value="Low">Low</option>
+                <option value="Moderate">Moderate</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="Physical_Activity">Physical Activity</label>
+              <select id="Physical_Activity" required>
+                <option value="Active">Active</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Sedentary">Sedentary</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="Diet">Diet</label>
+              <select id="Diet" required>
+                <option value="Healthy">Healthy</option>
+                <option value="Average">Average</option>
+                <option value="Unhealthy">Unhealthy</option>
+              </select>
+            </div>
+            <div class="field span-2">
+              <label for="Stress_Level">Stress Level</label>
+              <select id="Stress_Level" required>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="section-title">Medical History</legend>
+          <div class="toggles-grid">
+            <div class="toggle-row">
+              <label for="Hypertension">Hypertension</label>
+              <div class="switch">
+                <input type="checkbox" id="Hypertension">
+                <span class="slider"></span>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <label for="Diabetes">Diabetes</label>
+              <div class="switch">
+                <input type="checkbox" id="Diabetes">
+                <span class="slider"></span>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <label for="Hyperlipidemia">Hyperlipidemia</label>
+              <div class="switch">
+                <input type="checkbox" id="Hyperlipidemia">
+                <span class="slider"></span>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <label for="Family_History">Family History</label>
+              <div class="switch">
+                <input type="checkbox" id="Family_History">
+                <span class="slider"></span>
+              </div>
+            </div>
+            <div class="toggle-row span-2">
+              <label for="Previous_Heart_Attack">Previous Heart Attack</label>
+              <div class="switch">
+                <input type="checkbox" id="Previous_Heart_Attack">
+                <span class="slider"></span>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Assess Risk</button>
+        <div class="error-box" id="error-box"></div>
+      </form>
+    </div>
+
+    <!-- RESULT -->
+    <div class="card result-card">
+      <div class="section-title">Risk Assessment</div>
+
+      <div class="result-empty" id="result-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 21s-7.5-4.6-10-9.3C.3 8.1 2 4.5 5.6 4c2-.3 3.8.6 4.8 2.2C11.4 4.6 13.2 3.7 15.2 4 18.8 4.5 20.5 8.1 18.8 11.7 16.3 16.4 8.8 21 8.8 21" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>Fill in the form and click "Assess Risk" to see a prediction here.</p>
+      </div>
+
+      <div class="result-body" id="result-body">
+        <div class="risk-badge">
+          <span class="risk-dot" id="risk-dot"></span>
+          <span id="risk-level-text">—</span>
+        </div>
+        <div class="probability-readout">
+          Model confidence: <span id="probability-text">—</span>
+        </div>
+
+        <div class="spectrum">
+          <div class="spectrum-track">
+            <div class="spectrum-marker" id="spectrum-marker"></div>
+          </div>
+          <div class="spectrum-labels">
+            <span>Low</span>
+            <span>Medium</span>
+            <span>High</span>
+          </div>
+        </div>
+
+        <div class="recommendation-box" id="recommendation-text">—</div>
+
+        <div class="finder-section" id="finder-section">
+          <button class="finder-btn" id="finder-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Find Nearby Hospitals
+          </button>
+          <div class="finder-status" id="finder-status"></div>
+          <div class="hospital-list" id="hospital-list"></div>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        This tool provides a preliminary screening estimate only, generated by a deep learning model trained on a synthetic dataset. It is not a medical diagnosis and does not replace consultation with a qualified healthcare professional.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Auth guard: redirect to login if not signed in ----
+  const currentUser = JSON.parse(localStorage.getItem("cardiopredict_user") || "null");
+  if (!currentUser) {
+    window.location.href = "login.html";
+  } else {
+    document.getElementById("user-name-text").textContent = "Hi, " + currentUser.name.split(" ")[0];
+  }
+
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    localStorage.removeItem("cardiopredict_user");
+    window.location.href = "login.html";
+  });
+
+  const API_URL = "http://127.0.0.1:5000/predict";
+
+  const form = document.getElementById("predict-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const errorBox = document.getElementById("error-box");
+  const resultEmpty = document.getElementById("result-empty");
+  const resultBody = document.getElementById("result-body");
+
+  const riskColors = {
+    Low: "#059669",
+    Medium: "#D97706",
+    High: "#DC2626"
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.style.display = "none";
+
+    const payload = {
+      Age: Number(document.getElementById("Age").value),
+      Gender: document.getElementById("Gender").value,
+      Weight: Number(document.getElementById("Weight").value),
+      Height: Number(document.getElementById("Height").value),
+      BMI: Number(document.getElementById("BMI").value),
+      Smoking: document.getElementById("Smoking").value,
+      Alcohol_Intake: document.getElementById("Alcohol_Intake").value,
+      Physical_Activity: document.getElementById("Physical_Activity").value,
+      Diet: document.getElementById("Diet").value,
+      Stress_Level: document.getElementById("Stress_Level").value,
+      Hypertension: document.getElementById("Hypertension").checked ? 1 : 0,
+      Diabetes: document.getElementById("Diabetes").checked ? 1 : 0,
+      Hyperlipidemia: document.getElementById("Hyperlipidemia").checked ? 1 : 0,
+      Family_History: document.getElementById("Family_History").checked ? 1 : 0,
+      Previous_Heart_Attack: document.getElementById("Previous_Heart_Attack").checked ? 1 : 0,
+      Systolic_BP: Number(document.getElementById("Systolic_BP").value),
+      Diastolic_BP: Number(document.getElementById("Diastolic_BP").value),
+      Heart_Rate: Number(document.getElementById("Heart_Rate").value),
+      Blood_Sugar_Fasting: Number(document.getElementById("Blood_Sugar_Fasting").value),
+      Cholesterol_Total: Number(document.getElementById("Cholesterol_Total").value)
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Assessing <span class="loading-dots"><span></span><span></span><span></span></span>';
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong while predicting.");
+      }
+
+      renderResult(data);
+
+    } catch (err) {
+      errorBox.textContent = err.message.includes("Failed to fetch")
+        ? "Couldn't reach the backend. Make sure app.py is running on http://127.0.0.1:5000."
+        : err.message;
+      errorBox.style.display = "block";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Assess Risk";
+    }
+  });
+
+  function animateNumber(el, target, duration = 900) {
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = (target * eased).toFixed(1);
+      el.innerHTML = `<span>${value}%</span> predicted probability`;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function renderResult(data) {
+    resultEmpty.classList.add("hide");
+    resultBody.classList.remove("show");
+    void resultBody.offsetWidth; // restart animation
+    resultBody.classList.add("show");
+
+    const riskLevelText = document.getElementById("risk-level-text");
+    const riskDot = document.getElementById("risk-dot");
+    const probabilityText = document.getElementById("probability-text");
+    const recommendationText = document.getElementById("recommendation-text");
+    const marker = document.getElementById("spectrum-marker");
+
+    const color = riskColors[data.risk_level] || "#E6EDF7";
+
+    riskLevelText.textContent = data.risk_level + " Risk";
+    riskLevelText.style.color = color;
+    riskDot.style.background = color;
+    riskDot.style.color = color;
+
+    animateNumber(probabilityText, data.probability * 100);
+    recommendationText.textContent = data.recommendation;
+
+    const pos = Math.min(100, Math.max(0, data.probability * 100));
+    marker.style.setProperty("--marker-glow", color);
+    requestAnimationFrame(() => {
+      marker.style.left = pos + "%";
+    });
+
+    // Show the "Find Nearby Hospitals" prompt for Medium/High risk results
+    const finderSection = document.getElementById("finder-section");
+    const hospitalList = document.getElementById("hospital-list");
+    const finderStatus = document.getElementById("finder-status");
+    hospitalList.innerHTML = "";
+    finderStatus.textContent = "";
+    if (data.risk_level === "Medium" || data.risk_level === "High") {
+      finderSection.classList.add("show");
+    } else {
+      finderSection.classList.remove("show");
+    }
+  }
+
+  // ---------------------------------------------
+  // Nearby Hospital Finder — uses browser geolocation
+  // + OpenStreetMap's free Overpass API (no key needed)
+  // ---------------------------------------------
+  function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  document.getElementById("finder-btn").addEventListener("click", () => {
+    const btn = document.getElementById("finder-btn");
+    const status = document.getElementById("finder-status");
+    const list = document.getElementById("hospital-list");
+
+    if (!navigator.geolocation) {
+      status.textContent = "Geolocation isn't supported in this browser.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Locating you…";
+    status.textContent = "";
+    list.innerHTML = "";
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        status.textContent = "Searching nearby hospitals…";
+
+        const query = `[out:json][timeout:15];(node["amenity"="hospital"](around:8000,${latitude},${longitude});way["amenity"="hospital"](around:8000,${latitude},${longitude}););out center 15;`;
+
+        try {
+          const res = await fetch("https://overpass-api.de/api/interpreter", {
+            method: "POST",
+            body: "data=" + encodeURIComponent(query)
+          });
+          const data = await res.json();
+
+          const results = (data.elements || [])
+            .map(el => {
+              const lat = el.lat || (el.center && el.center.lat);
+              const lon = el.lon || (el.center && el.center.lon);
+              if (!lat || !lon) return null;
+              return {
+                name: (el.tags && el.tags.name) || "Unnamed Hospital",
+                lat, lon,
+                distance: haversineDistanceKm(latitude, longitude, lat, lon)
+              };
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 6);
+
+          list.innerHTML = "";
+          status.textContent = "";
+
+          if (results.length === 0) {
+            status.textContent = "No hospitals found nearby. Try a broader search area.";
+          } else {
+            results.forEach(h => {
+              const card = document.createElement("div");
+              card.className = "hospital-card";
+              card.innerHTML = `
+                <div class="hospital-info">
+                  <div class="hospital-name">${h.name}</div>
+                  <div class="hospital-distance">${h.distance.toFixed(1)} km away</div>
+                </div>
+                <a class="directions-link" target="_blank" rel="noopener"
+                   href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}">
+                  Directions
+                </a>
+              `;
+              list.appendChild(card);
+            });
+          }
+        } catch (err) {
+          status.textContent = "Couldn't fetch nearby hospitals. Check your internet connection.";
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Find Nearby Hospitals`;
+        }
+      },
+      (error) => {
+        status.textContent = "Location access denied. Enable location permissions to use this feature.";
+        btn.disabled = false;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Find Nearby Hospitals`;
+      }
+    );
+  });
+</script>
+
+</body>
+</html>
