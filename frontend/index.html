@@ -1022,14 +1022,45 @@
         const { latitude, longitude } = position.coords;
         status.textContent = "Searching nearby hospitals…";
 
-        const query = `[out:json][timeout:15];(node["amenity"="hospital"](around:8000,${latitude},${longitude});way["amenity"="hospital"](around:8000,${latitude},${longitude}););out center 15;`;
+        const query = `[out:json][timeout:20];(node["amenity"="hospital"](around:8000,${latitude},${longitude});way["amenity"="hospital"](around:8000,${latitude},${longitude}););out center 15;`;
+
+        // Try multiple free Overpass mirrors in order — the public servers
+        // occasionally get overloaded, so we fall back automatically.
+        const mirrors = [
+          "https://overpass-api.de/api/interpreter",
+          "https://overpass.kumi.systems/api/interpreter",
+          "https://overpass.openstreetmap.ru/api/interpreter"
+        ];
+
+        let data = null;
+        let lastError = null;
+
+        for (const mirror of mirrors) {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+            const res = await fetch(mirror, {
+              method: "POST",
+              body: "data=" + encodeURIComponent(query),
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+            data = await res.json();
+            break; // success — stop trying other mirrors
+          } catch (err) {
+            lastError = err;
+            console.warn(`Hospital finder: mirror ${mirror} failed —`, err.message);
+            continue; // try next mirror
+          }
+        }
 
         try {
-          const res = await fetch("https://overpass-api.de/api/interpreter", {
-            method: "POST",
-            body: "data=" + encodeURIComponent(query)
-          });
-          const data = await res.json();
+          if (!data) {
+            throw lastError || new Error("All servers unavailable");
+          }
 
           const results = (data.elements || [])
             .map(el => {
@@ -1069,7 +1100,8 @@
             });
           }
         } catch (err) {
-          status.textContent = "Couldn't fetch nearby hospitals. Check your internet connection.";
+          console.error("Hospital finder failed:", err);
+          status.textContent = "Couldn't reach hospital data servers right now. Please try again in a moment.";
         } finally {
           btn.disabled = false;
           btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Find Nearby Hospitals`;
