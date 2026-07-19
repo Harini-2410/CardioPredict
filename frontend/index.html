@@ -636,8 +636,8 @@
               <input type="number" id="Height" required min="100" max="250" step="0.1" placeholder="e.g. 172">
             </div>
             <div class="field span-2">
-              <label for="BMI">BMI</label>
-              <input type="number" id="BMI" required min="10" max="60" step="0.1" placeholder="e.g. 26.4">
+              <label for="BMI">BMI <span id="bmi-auto-tag" style="color:var(--teal); font-weight:600;"></span></label>
+              <input type="number" id="BMI" required min="10" max="60" step="0.1" placeholder="Auto-calculated from weight & height">
             </div>
           </div>
         </fieldset>
@@ -815,6 +815,43 @@
 </div>
 
 <script>
+  // ---------------------------------------------
+  // BMI auto-calculator
+  // Computes BMI from Weight (kg) and Height (cm) automatically.
+  // If the user manually types into the BMI field themselves, we stop
+  // auto-overwriting it (respects a doctor-provided/measured BMI).
+  // ---------------------------------------------
+  const weightInput = document.getElementById("Weight");
+  const heightInput = document.getElementById("Height");
+  const bmiInput = document.getElementById("BMI");
+  const bmiAutoTag = document.getElementById("bmi-auto-tag");
+  let bmiManuallyEdited = false;
+
+  function recalcBMI() {
+    const w = parseFloat(weightInput.value);
+    const h = parseFloat(heightInput.value);
+    if (w > 0 && h > 0 && !bmiManuallyEdited) {
+      const heightM = h / 100;
+      const bmi = w / (heightM * heightM);
+      bmiInput.value = bmi.toFixed(1);
+      bmiAutoTag.textContent = "(auto)";
+    }
+  }
+
+  weightInput.addEventListener("input", recalcBMI);
+  heightInput.addEventListener("input", recalcBMI);
+
+  bmiInput.addEventListener("input", () => {
+    bmiManuallyEdited = true;
+    bmiAutoTag.textContent = "(manually edited)";
+  });
+
+  // Double-click BMI field to reset back to auto-calculated mode
+  bmiInput.addEventListener("dblclick", () => {
+    bmiManuallyEdited = false;
+    recalcBMI();
+  });
+
   // ---- Auth guard: redirect to login if not signed in ----
   const currentUser = JSON.parse(localStorage.getItem("cardiopredict_user") || "null");
   if (!currentUser) {
